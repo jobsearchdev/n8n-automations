@@ -1,0 +1,498 @@
+{
+  "name": "SERP positions → Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.site.com/v3/serp/google/organic/live/advanced",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Basic YOUR_BASE64(login:password)"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[\n  {\n    \"keyword\": \"{{ $json.keyword }}\",\n    \"location_code\": \"{{ $json.location_code }}\",\n    \"language_code\": \"{{ $json.language_code }}\",\n    \"device\": \"{{ $json.device }}\",\n    \"os\": \"{{ $json.os }}\",\n    \"depth\": \"{{ $json.depth }}\",\n    \"max_crawl_pages\":{{ $json.max_crawl_pages }},\n    \"se_type\": \"{{ $json.se_type }}\"\n  }\n] ",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        336,
+        0
+      ],
+      "id": "b1d83679-a93f-4dfa-b368-04a9b96ac1db",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[0].result[0].items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "1de1d86a-c4a9-498c-94c9-948161a2a0c1",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "be171cc2-970a-4b82-91db-02711338b13c",
+              "leftValue": "={{ $json.url }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        0
+      ],
+      "id": "9337762e-267e-4e6f-a883-a5a15329612d",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "93fa5a6a-388c-4417-b28c-404c89580857",
+              "name": "keyword",
+              "value": "={{ $('HTTP Request').item.json.tasks[0].result[0].keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "d632e061-09c3-4735-9a20-8ee9ba2c0f51",
+              "name": "location_code",
+              "value": "={{ $('HTTP Request').item.json.tasks[0].data.location_code }}",
+              "type": "number"
+            },
+            {
+              "id": "b25b0947-43e6-4550-b5b0-09db52672acc",
+              "name": "language_code",
+              "value": "={{ $('HTTP Request').item.json.tasks[0].result[0].language_code }}",
+              "type": "string"
+            },
+            {
+              "id": "360209cb-369f-4e3a-96b6-63670b240fa6",
+              "name": "rank",
+              "value": "={{ $json.rank_absolute }}",
+              "type": "string"
+            },
+            {
+              "id": "301a0d84-a381-4eff-b8bd-10a4ee13cbec",
+              "name": "type",
+              "value": "=organic",
+              "type": "string"
+            },
+            {
+              "id": "aa15a0a4-fb77-4ccf-b551-dcc3d80dc324",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "3ebaef14-6941-42b2-8142-f01253d16794",
+              "name": "domain",
+              "value": "={{ $json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "2ff261f0-f3eb-4d62-9a29-b3d406626270",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "bf9ee67b-791c-4350-9b15-d8c234a14560",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "1272de24-fec8-4740-a9c0-1627e6d86b6e",
+              "name": "page",
+              "value": "={{ $json.page }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "28cba29c-9056-4157-bd07-0567b117cacf",
+      "name": "maping data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f8e8e75-5613-4ffa-8dbf-1cf3e92be268",
+              "name": "keyword",
+              "value": "={{ $json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "b9292ffc-9033-4fab-a889-bf026802fa9c",
+              "name": "location_code",
+              "value": "={{ $json.location_code }}",
+              "type": "string"
+            },
+            {
+              "id": "64e0921e-5c99-4002-a61d-687e308df555",
+              "name": "language_code",
+              "value": "={{ $json.language_code }}",
+              "type": "string"
+            },
+            {
+              "id": "2d72df1d-8629-4000-a393-f63e687a3b69",
+              "name": "device",
+              "value": "={{ $json.device }}",
+              "type": "string"
+            },
+            {
+              "id": "ddfae6bb-85c9-4acd-9ab3-58f9d44a9235",
+              "name": "os",
+              "value": "={{ $json.os }}",
+              "type": "string"
+            },
+            {
+              "id": "2cbfda3b-2974-49bf-8692-add2a0b7dbcb",
+              "name": "depth",
+              "value": "={{ $json.depth }}",
+              "type": "string"
+            },
+            {
+              "id": "f69aad61-f63d-4fed-911c-278d050cb9ca",
+              "name": "max_crawl_pages",
+              "value": "={{ $json.max_crawl_pages }}",
+              "type": "string"
+            },
+            {
+              "id": "03c7c33b-e156-4313-a980-3cda2ca39667",
+              "name": "se_type",
+              "value": "={{ $json.se_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "08e78330-04c0-481f-b708-0e4205688beb",
+      "name": "Test data"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "SERP results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit?usp=fgjdjdds"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 0,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "keyword": "={{ $json.keyword }}",
+            "location_code": "={{ $json.location_code }}",
+            "language_code": "={{ $json.language_code }}",
+            "rank": "={{ $json.rank }}",
+            "type": "={{ $json.type }}",
+            "domain": "={{ $json.domain }}",
+            "url": "={{ $json.url }}",
+            "title": "={{ $json.title }}",
+            "description": "={{ $json.description }}",
+            "page": "={{ $json.page }}"
+          },
+          "matchingColumns": [
+            "keyword"
+          ],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "location_code",
+              "displayName": "location_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language_code",
+              "displayName": "language_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rank",
+              "displayName": "rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "page",
+              "displayName": "page",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1280,
+        0
+      ],
+      "id": "8b83745b-8117-419a-9274-5c557672519b",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        0
+      ],
+      "id": "a2ae340d-b5b1-483c-9975-e1be484b7237",
+      "name": "test data"
+    },
+    {
+      "parameters": {
+        "content": "## Сюди підключаємо джерело, яке віддає дані в такому форматі\n\n\n[\n  {\n    \"keyword\": \"example keyword\",\n    \"location_code\": 2792,\n    \"language_code\": \"tr\",\n    \"device\": \"mobile\",\n    \"os\": \"android\",\n    \"depth\": 100,\n    \"max_crawl_pages\": 10,\n    \"use_cache\": false,\n    \"se_type\": \"organic\"\n  }\n]",
+        "height": 368,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -144
+      ],
+      "id": "d633fb2a-1931-4be5-8eee-fa987d10c5b4",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {
+    "test data": [
+      {
+        "json": {
+          "keyword": "example keyword",
+          "location_code": 2792,
+          "language_code": "tr",
+          "device": "mobile",
+          "os": "android",
+          "depth": 100,
+          "max_crawl_pages": 10,
+          "use_cache": false,
+          "se_type": "organic"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "maping data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "maping data": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "test data": {
+      "main": [
+        [
+          {
+            "node": "Test data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

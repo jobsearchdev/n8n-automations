@@ -1,0 +1,1031 @@
+{
+  "name": "Indexing — sitemaps monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sitemaps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        1920,
+        304
+      ],
+      "id": "d0dbc0c0-46d9-4d65-b10b-06eac9b39cf0",
+      "name": "Sitemaps-Start",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2256,
+        64
+      ],
+      "id": "8c906351-3e1d-406b-842f-a8bc95ff5205",
+      "name": "Тестові дані",
+      "notesInFlow": true,
+      "notes": "[\n  {\n    \"urls\": [\n      \"https://example.com/sitemap.xml\",\n      \"https://blog.example.com/sitemap.xml\"\n    ]\n  }\n]"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YOUR_SITEMAPS_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "sitemaps",
+          "cachedResultUrl": "/projects/YOUR_PROJECT_ID/datatables/YOUR_SITEMAPS_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "urls",
+              "condition": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2560,
+        560
+      ],
+      "id": "4ad5b1fd-4b3e-4640-8820-5dff1669ee09",
+      "name": "Витягуємо всі дані з таблиці",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YOUR_SITEMAPS_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "sitemaps",
+          "cachedResultUrl": "/projects/YOUR_PROJECT_ID/datatables/YOUR_SITEMAPS_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "urls",
+              "keyValue": "={{ $json.url }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "urls": "={{ $json.url }}"
+          },
+          "matchingColumns": [
+            "urls"
+          ],
+          "schema": [
+            {
+              "id": "urls",
+              "displayName": "urls",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        304
+      ],
+      "id": "1e098bf5-cf36-4c14-85b0-89a02b1f9c39",
+      "name": "перевірка чи є в базі такі урли, які додаємо і якщо немає, додаємо",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "dataPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        3232,
+        288
+      ],
+      "id": "b24a6242-52ad-4a32-9a87-82bb5940b020",
+      "name": "XML",
+      "notesInFlow": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YOUR_URLS_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "urls",
+          "cachedResultUrl": "/projects/YOUR_PROJECT_ID/datatables/YOUR_URLS_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "loc",
+              "keyValue": "={{ $json.loc }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3680,
+        320
+      ],
+      "id": "546e69b5-d928-4189-8514-5a83a90713f6",
+      "name": "Витягуємо всі дані з таблиці1",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "content": "Обробка урлів з сайтмапів і додавання їх в базу",
+        "height": 528,
+        "width": 640,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2960,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "4020052d-b5cb-42c1-9994-55004cc0c1d0",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Отримування мап з sitemap.xml і обробка їх",
+        "height": 512,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2384,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "f893a435-8662-4555-8e5f-7ff8ad26e68a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "urls",
+        "options": {
+          "destinationFieldName": ""
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2992,
+        288
+      ],
+      "id": "d3d6b791-7dfb-4135-b9fe-eece94a55c12",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3008,
+        496
+      ],
+      "id": "f10587eb-a08e-4a70-9d3e-42d87d9f10d5",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet result = [];\n\nfor (const item of items) {\n  const urls = item.json.urlset?.url ?? [];\n  const arr = Array.isArray(urls) ? urls : [urls];\n\n  for (const u of arr) {\n    result.push({\n      json: {\n        loc: u.loc ?? null,\n        lastmod: u.lastmod ?? null,\n      }\n    });\n  }\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3248,
+        496
+      ],
+      "id": "85b873b2-81e3-4803-a328-2320fd7d6bb9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YOUR_URLS_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "urls",
+          "cachedResultUrl": "/projects/YOUR_PROJECT_ID/datatables/YOUR_URLS_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "updatedAt",
+              "condition": "isNotEmpty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4096,
+        896
+      ],
+      "id": "5a103323-8b25-4960-9547-b355d5867081",
+      "name": "Швидка чистка таблиці",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-INDEXING-SERVICE/api.php",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "YOUR_INDEXING_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "urls",
+              "value": "={{ $json.urls }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5792,
+        480
+      ],
+      "id": "8cdcdda6-fe4e-43af-b2f9-9a1cf7f64ae3",
+      "name": "Відправляємо запит на індексацію сторінок2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "loc, lastmod",
+        "joinMode": "keepNonMatches",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3856,
+        496
+      ],
+      "id": "bf71684d-797f-487c-b14e-c0daa1e74fdb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const norm = (u) => (u || \"\").trim().replace(/\\/+$/, \"/\");\n\nconst all = $input.all().map(i => i.json);\n\nconst dbItems = [];\nconst sitemapItems = [];\n\n// Розділяємо потоки\nfor (const r of all) {\n  if (r.id || r.createdAt || r.updatedAt) dbItems.push(r);\n  else sitemapItems.push(r);\n}\n\n// Map бази\nconst dbMap = new Map();\nfor (const r of dbItems) {\n  const loc = norm(r.loc || r[\"місце\"]);\n  const lastmod = r.lastmod || r[\"останнмод\"];\n  if (!loc || !lastmod) continue;\n  dbMap.set(loc, new Date(lastmod));\n}\n\n// Результат\nconst result = [];\n\nfor (const r of sitemapItems) {\n  const loc = norm(r.loc);\n  const lastmod = r.lastmod;\n  if (!loc || !lastmod) continue;\n\n  const sitemapDate = new Date(lastmod);\n  const dbDate = dbMap.get(loc);\n\n  // 1️⃣ Немає в базі\n  if (!dbDate) {\n    result.push({\n      json: { loc, lastmod, action: \"insert\" }\n    });\n  }\n\n  // 2️⃣ Є в базі, але дата новіша\n  else if (sitemapDate > dbDate) {\n    result.push({\n      json: { loc, lastmod, action: \"update\" }\n    });\n  }\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4144,
+        496
+      ],
+      "id": "5ed6e754-7f68-4c9a-ac99-377c23bd2762",
+      "name": "Фільтруємо урли, немає в базі і ластмод новіший"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "acd11b54-272f-423c-957a-1a479091f409",
+              "leftValue": "={{$json.action}}",
+              "rightValue": "insert",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4352,
+        496
+      ],
+      "id": "0d16c5f9-7e4d-4234-83a4-de7479e36102",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "598672a6-2ed7-4442-98c7-c647cc26903a",
+              "name": "loc",
+              "value": "={{ $json.loc }}",
+              "type": "string"
+            },
+            {
+              "id": "f1b7043b-549f-44e4-9196-1a1439443fdf",
+              "name": "lastmod",
+              "value": "={{ $json.lastmod }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4560,
+        592
+      ],
+      "id": "59db0e12-7262-465e-8c8d-cc389514d039",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YOUR_URLS_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "urls",
+          "cachedResultUrl": "/projects/YOUR_PROJECT_ID/datatables/YOUR_URLS_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "loc",
+              "keyValue": "={{ $json.loc }}"
+            },
+            {
+              "keyName": "lastmod",
+              "keyValue": "={{ $json.lastmod }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "lastmod": "={{ $json.lastmod }}",
+            "loc": "={{ $json.loc }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "loc",
+              "displayName": "loc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "lastmod",
+              "displayName": "lastmod",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4960,
+        784
+      ],
+      "id": "ef7c71c5-68a4-4dbb-9e3d-0ce9c50db1ac",
+      "name": "Update row(s)",
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "598672a6-2ed7-4442-98c7-c647cc26903a",
+              "name": "urls",
+              "value": "={{ $json.loc }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4864,
+        576
+      ],
+      "id": "ddc7d41a-e35a-48a6-b5e7-13541d44633e",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "598672a6-2ed7-4442-98c7-c647cc26903a",
+              "name": "loc",
+              "value": "={{ $json.loc }}",
+              "type": "string"
+            },
+            {
+              "id": "f1b7043b-549f-44e4-9196-1a1439443fdf",
+              "name": "lastmod",
+              "value": "={{ $json.lastmod }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4560,
+        432
+      ],
+      "id": "e2df983c-7f3b-4317-aeeb-b71d186f0069",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "YOUR_URLS_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "urls",
+          "cachedResultUrl": "/projects/YOUR_PROJECT_ID/datatables/YOUR_URLS_TABLE_ID"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "loc",
+              "keyValue": "={{ $json.loc }}"
+            },
+            {
+              "keyName": "lastmod",
+              "keyValue": "={{ $json.lastmod }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "loc": "={{ $json.loc }}",
+            "lastmod": "={{ $json.lastmod }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "loc",
+              "displayName": "loc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "lastmod",
+              "displayName": "lastmod",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4848,
+        192
+      ],
+      "id": "012dfb64-158d-4b39-9f4e-26eb71952d96",
+      "name": "Upsert row(s)"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        5152,
+        480
+      ],
+      "id": "e54f2305-8563-47a5-862b-1623e177d561",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1d38916-6d94-4cef-8f66-e483cfbe4b80",
+              "name": "urls",
+              "value": "={{ $json.loc }}",
+              "type": "string"
+            },
+            {
+              "id": "98cee2c1-e9e0-4f19-8d2f-c9e8ec292c1f",
+              "name": "lastmod",
+              "value": "={{ $json.lastmod }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4864,
+        432
+      ],
+      "id": "637c366e-064e-4434-b141-0d5b5408f7c2",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9d96cae5-276f-4b73-b682-488a1dc67e5f",
+              "name": "urls",
+              "value": "={{ [$json.urls] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5360,
+        480
+      ],
+      "id": "0c88f32d-6626-453a-bbf9-6f80151aec7e",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    urls: $input.all().map(i => i.json.urls[0])\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5568,
+        480
+      ],
+      "id": "b12c0e1f-fea1-4454-87d6-215b3f58b028",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        48
+      ],
+      "id": "dd08de31-3b05-450b-a217-083ddb69f747",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        2048,
+        848
+      ],
+      "id": "7c9ae8d7-d449-4cbd-b795-6ce08f696a28",
+      "name": "Schedule Trigger",
+      "retryOnFail": true,
+      "waitBetweenTries": 500,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{ $json.message }}{{ $json.count }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        6016,
+        480
+      ],
+      "id": "0bdfb64e-a229-4288-9b20-f2c60fc099ce",
+      "name": "Повідомлення в бота про кількість відправлених сторінок",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram bot"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "Тестові дані": [
+      {
+        "json": {
+          "url": "https://blog.example.com/sitemap-home.xml"
+        }
+      },
+      {
+        "json": {
+          "url": "https://blog.example.com/sitemap-service-pages.xml"
+        }
+      },
+      {
+        "json": {
+          "url": "https://blog.example.com/sitemap-news.xml"
+        }
+      },
+      {
+        "json": {
+          "url": "https://blog.example.com/sitemap-posts.xml"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Sitemaps-Start": {
+      "main": [
+        [
+          {
+            "node": "перевірка чи є в базі такі урли, які додаємо і якщо немає, додаємо",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Тестові дані": {
+      "main": [
+        [
+          {
+            "node": "перевірка чи є в базі такі урли, які додаємо і якщо немає, додаємо",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "перевірка чи є в базі такі урли, які додаємо і якщо немає, додаємо": {
+      "main": [
+        [
+          {
+            "node": "Витягуємо всі дані з таблиці",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Витягуємо всі дані з таблиці": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Витягуємо всі дані з таблиці1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Витягуємо всі дані з таблиці1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Швидка чистка таблиці": {
+      "main": [
+        []
+      ]
+    },
+    "Відправляємо запит на індексацію сторінок2": {
+      "main": [
+        [
+          {
+            "node": "Повідомлення в бота про кількість відправлених сторінок",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Фільтруємо урли, немає в базі і ластмод новіший",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Фільтруємо урли, немає в базі і ластмод новіший": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Відправляємо запит на індексацію сторінок2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Тестові дані",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Витягуємо всі дані з таблиці",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Повідомлення в бота про кількість відправлених сторінок": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,172 @@
+{
+  "name": "Indexing — URL list",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -272
+      ],
+      "id": "7866e7e5-5ef2-4444-860b-20d29d730c70",
+      "name": "Тестові дані1",
+      "notesInFlow": true,
+      "notes": "[\n  {\n    \"urls\": [\n      \"https://example.com/\",\n      \"https://blog.example.com/\"\n    ]\n  }\n]"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-INDEXING-SERVICE/api.php",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "YOUR_INDEXING_API_KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "urls",
+              "value": "={{ $json.urls }}"
+            },
+            {
+              "name": "=urls",
+              "value": "={{ $json.urls }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1232,
+        -112
+      ],
+      "id": "a13fa363-c8f7-4f2a-9eed-9f065209e73f",
+      "name": "Відправляємо запит на індексацію сторінок1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/YOUR-WEBHOOK-ID",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json}}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        -240
+      ],
+      "id": "fa3a9bf8-e27e-4408-add2-80a7d30c7de6",
+      "name": "Передаємо отримані дані на вебхук урл1",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "content": "curl -X POST https://YOUR-N8N-DOMAIN/webhook/urls \\\n  -H \"Content-Type: application/json\" \\\n  -d '[\n    {\n      \"urls\": [\n        \"https://example.com/\",\n        \"https://blog.example.com/\"\n      ]\n    }\n  ]'\nПриклад curl для запуску",
+        "height": 224,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "f830db39-a084-4d05-ae57-1f61ada590a0",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "urls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        320,
+        -288
+      ],
+      "id": "2eebe67f-bdc8-4ae7-95f0-7a65370f9edb",
+      "name": "urls-Start",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {
+    "Тестові дані1": [
+      {
+        "json": {
+          "urls": [
+            "https://example.com/",
+            "https://blog.example.com/"
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Тестові дані1": {
+      "main": [
+        [
+          {
+            "node": "Передаємо отримані дані на вебхук урл1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Відправляємо запит на індексацію сторінок1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Відправляємо запит на індексацію сторінок1": {
+      "main": [
+        [
+          {
+            "node": "Передаємо отримані дані на вебхук урл1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "urls-Start": {
+      "main": [
+        [
+          {
+            "node": "Тестові дані1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
